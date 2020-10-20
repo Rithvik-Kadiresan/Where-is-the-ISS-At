@@ -1,0 +1,142 @@
+<!-- Rithvik Kadiresan -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA=Compatible" content="ie=edge"/>
+    <!-- Leaflet.js css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+
+
+    <!-- Leaflet.js JS Library -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+    <!-- Internal CSS Styling fo rLeaflet Requuirements -->
+    <style>
+        #issMap { 
+            height: 550px;
+            }
+
+        .html,body{
+            font-family: 'Lucida Sans';
+            background-color: #161616;
+            overflow: hidden;
+        }
+        h1 {
+            font-weight: bolder;
+            color: #eeeeee;
+            /* text-align: center; */
+        }
+        span {
+            font-weight: lighter;
+            color: #eeeeee;
+            /* text-align: center; */
+        }
+        p{
+          color: #eeeeee; 
+          font-weight: bolder;
+          text-transform: uppercase;
+          /* text-align: center; */ 
+          font-size: 20;
+        }
+
+    </style>
+
+
+    <title>JSON Map</title>
+</head>
+
+<!-- Body Elements -->
+
+<body>
+    <h1>Where is the ISS?</h1>
+
+    <p><b>latitude: </b> <span id="lat"></span>* <br><b>longitude:  </b><span id="lon"></span>*</p>
+
+    <div id="issMap"></div>
+
+
+
+<!-- Where the Script Starts -->
+
+
+
+    <script>
+
+    //leaflet.js map
+    const mymap = L.map('issMap').setView([0,0], 3);
+
+    //icon formatting options from leaflet
+
+    var issIcon = L.icon({
+        iconUrl: 'iss200.png',
+        iconSize: [50,32],
+        iconAnchor: [25,16],
+    });
+
+
+
+    //adding marker 
+    const marker = L.marker([0,0], {icon: issIcon}).addTo(mymap);
+
+
+
+    //Open Street Map Attribution
+
+    const attribution = '&copy; <a href = "https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+    const tileUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    const tiles = L.tileLayer(tileUrl, {attribution});
+    tiles.addTo(mymap);
+
+
+
+    //where is the iss at api
+
+    const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
+
+
+
+    //fetch async function
+
+    async function getISS(){
+        const response = await fetch(api_url);
+        const data = await response.json();
+        //console.log('fetched data');
+
+        const {latitude, longitude} = data;
+
+
+        //Leaftlet adding marker 
+
+        marker.setLatLng([latitude, longitude]); 
+
+        mymap.setView([latitude,longitude]);
+
+
+        
+        document.getElementById('lat').textContent = latitude.toFixed(4);
+        
+        document.getElementById('lon').textContent = longitude.toFixed(4);
+        
+    }
+
+
+
+    //calling function
+    getISS();
+
+
+    setInterval(getISS, 1000);
+
+    </script>
+</body>
+</html>
+
